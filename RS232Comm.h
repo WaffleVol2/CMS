@@ -3,6 +3,7 @@
  *
  */
 #pragma once
+#define MSGSIZE 140
 
 // Prototype the functions to be used
 void initPort(HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout);

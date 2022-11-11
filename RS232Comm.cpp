@@ -29,9 +29,9 @@ void RX(int comRate, int comBits, COMMTIMEOUTS tOut) { //receive
 	CloseHandle(hComRx);										// Close the handle to Rx port 
 }
 
-void TX(int comRate, int comBits, COMMTIMEOUTS tOut, char msgOut[]) { //transmit
+void TX(int comRate, int comBits, COMMTIMEOUTS tOut, char msgOut[MSGSIZE]) { //transmit
 	HANDLE hComTx;										// Pointer to the selected COM port (Transmitter)
-	wchar_t COMPORT_Tx[] = L"COM5";						// COM port used for Rx (use L"COM6" for transmit program)
+	wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
 
 	initPort(&hComTx, COMPORT_Tx, comRate, comBits, tOut);	// Initialize the Tx port
 	Sleep(500);
