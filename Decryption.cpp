@@ -9,9 +9,9 @@
 #include "Decryption.h"
 
 DWORD XORDecryption(DWORD RLEPayload) {
-
+	return(1);
 }
 
 DWORD VirgenereDecryption(DWORD huffPayload) {
-
+	return(1);
 }

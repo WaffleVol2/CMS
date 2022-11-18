@@ -18,14 +18,12 @@
 int nComRate = 9600;								// Baud (Bit) rate in bits/second 
 int nComBits = 8;									// Number of bits per frame
 COMMTIMEOUTS timeout;								// A commtimeout struct variable
-wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
-wchar_t COMPORT_Rx[] = L"COM3";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Tx[] = L"COM6";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Rx[] = L"COM7";						// COM port used for Rx (use L"COM6" for transmit program)
 
 Header TXHeader;
 Header RXHeader;
 void* rxPayload = NULL;											// Received payload (buffer) - void so it can be any data type
-
-char msgOut[MSGSIZE] = "Hi there person";
 
 void read(DWORD payload, Header* payloadHeader) {
 	switch ((*payloadHeader).compression) {
@@ -87,13 +85,8 @@ int configure(settingsConfigured* sets) {
 	return(1);
 }
 
-void custMsg() {
-	printf("Enter message: ");
-	scanf_s("%[^\n]s", msgOut, (unsigned int)sizeof(msgOut));
-	while (getchar() != '\n') {}
-}
 
-void RX(void** RXPayload, Header* RXHeader) { //receive
+DWORD RX(void** RXPayload, Header* RXHeader) { //receive
 	HANDLE hComRx;										// Pointer to the selected COM port (Receiver)
 	DWORD bytesRead;
 
@@ -106,7 +99,8 @@ void RX(void** RXPayload, Header* RXHeader) { //receive
 	purgePort(&hComRx);											// Purge the Rx port
 	CloseHandle(hComRx);										// Close the handle to Rx port 
 
-	read(bytesRead, *RXPayload);
+	return (bytesRead);
+	//read(bytesRead, (*RXPayload));
 }
 
 void TX(void* TXPayload, Header* TXHeader) { //transmit

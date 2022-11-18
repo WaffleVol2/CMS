@@ -4,6 +4,7 @@
 	Details: Settings - Contains all setting functions
 */
 #pragma once
+#include "Header.h"
 
 typedef struct settings settingsConfigured;
 
@@ -20,4 +21,4 @@ void portTXConfig();
 void combitsConfig();
 void view();
 void savePreset();
-void configApply();
+Header* configApply();

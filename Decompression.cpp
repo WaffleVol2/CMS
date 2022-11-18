@@ -10,9 +10,9 @@
 
 
 DWORD RLEDecompression(DWORD RLEPayload) {
-
+	return(1);
 }
 
 DWORD huffmanDecompression(DWORD huffPayload) {
-
+	return(1);
 }

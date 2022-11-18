@@ -14,6 +14,7 @@ settingsConfigured settings;
 int CMD;				//User Command
 
 void compressionConfig() {	
+	while (getchar() != '\n') {}
 	while(1) {
 		system("CLS");
 		printf("What type of compression would you like? \n[0] None | [1] RLE | [2] Huffman | [3] Both \n");
@@ -25,11 +26,12 @@ void compressionConfig() {
 		else {
 			printf("Error, Please try again.");
 		}
-		Sleep(500);
+		Sleep(1000);
 	}															
 }
 
 void encryptionConfig() {
+	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
 		printf("What type of encryption would you like? \n[0] None | [1] XOR | [2] Vigenere | [3] Both \n");
@@ -41,11 +43,12 @@ void encryptionConfig() {
 		else {
 			printf("Error, Please try again.");
 		}
-		Sleep(500);
+		Sleep(1000);
 	}
 }
 
 void comrateConfig() {
+	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
 		printf("What comrate would you like? \n[0] 110 | [1] 300 | [2] 1200 | [3] 2400 | [4] 4800 | [5] 9600 | [6] 19200 | [7] 38400 | [8] 57600 | [9] 115200\n");
@@ -53,42 +56,44 @@ void comrateConfig() {
 		switch (CMD) {
 		case '0':
 			settings.comrate = 110;
-			break;
+			return;
 		case '1':
 			settings.comrate = 300;
-			break;
+			return;
 		case '2':
 			settings.comrate = 1200;
-			break;
+			return;
 		case '3':
 			settings.comrate = 2400;
-			break;
+			return;
 		case '4':
 			settings.comrate = 4800;
-			break;
+			return;
 		case '5':
 			settings.comrate = 9600;
-			break;
+			return;
 		case '6':
 			settings.comrate = 19200;
-			break;
+			return;
 		case '7':
 			settings.comrate = 38400;
-			break;
+			return;
 		case '8':
 			settings.comrate = 57600;
-			break;
+			return;
 		case '9':
 			settings.comrate = 115200;
-			break;
+			return;
 		default:
-			Sleep(500);
+			printf("Error, Please try again.");
+			Sleep(1000);
 			break;
 		}
 	}
 }
 
 void portRXConfig() {
+	while (getchar() != '\n') {}
 		while (1) {
 			system("CLS");
 			printf("What com port would you like to use? \n[0] COM1 | [1] COM2 | [2] COM3 | [3] COM4 | [4] COM5 | [5] COM6 | [6] COM7 | [7] COM8 | [8] COM9\n");
@@ -129,6 +134,7 @@ void portRXConfig() {
 }
 
 void portTXConfig() { //Unsure how to overcome issue with wchar_t being a const
+	while (getchar() != '\n') {}
 		while (1) {
 			system("CLS");
 			printf("What com port would you like to use? \n[0] COM1 | [1] COM2 | [2] COM3 | [3] COM4 | [4] COM5 | [5] COM6 | [6] COM7 | [7] COM8 | [8] COM9\n");
@@ -170,6 +176,7 @@ void portTXConfig() { //Unsure how to overcome issue with wchar_t being a const
 }
 
 void combitsConfig() { //Need help from michael, com bits can be 2, 4 , 8...?
+	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
 		printf("How many bits per frame would you like? \n[0] COM1 | [1] COM2 | [2] COM3 | [3] COM4 | [4] COM5 | [5] COM6 | [6] COM7 | [7] COM8 | [8] COM9\n");
@@ -202,30 +209,30 @@ void combitsConfig() { //Need help from michael, com bits can be 2, 4 , 8...?
 
 void view() {
 	switch (txHeader.compression) {
-	case 0:
+	case '0':
 		printf("Compression: NONE\n");
 		break;
-	case 1:
+	case '1':
 		printf("Compression: RLE\n");
 		break;
-	case 2:
+	case '2':
 		printf("Compression: HUFFMAN\n");
 		break;
-	case 3:
+	case '3':
 		printf("Compression: RLE AND HUFFMAN\n");
 		break;
 	}
 	switch (txHeader.encryption) {
-	case 0:
+	case '0':
 		printf("Encryption: NONE\n");
 		break;
-	case 1:
+	case '1':
 		printf("Encryption: XOR\n");
 		break;
-	case 2:
+	case '2':
 		printf("Encryption: VIRGENERE\n");
 		break;
-	case 3:
+	case '3':
 		printf("Encryption: XOR AND VIRGENERE\n");
 		break;
 	}
@@ -237,6 +244,6 @@ void savePreset() {
 
 }
 
-void configApply() {
-
+Header* configApply() {
+	return (&txHeader);
 }

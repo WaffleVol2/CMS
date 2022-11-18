@@ -4,6 +4,7 @@
  */
 #pragma once
 #include "Settings.h"
+#include "Header.h"
 #define MSGSIZE 140
 
 // Prototype the functions to be used
@@ -13,9 +14,8 @@ void outputToPort(HANDLE* hCom, LPCVOID buf, DWORD szBuf);
 DWORD inputFromPort(HANDLE* hCom, LPVOID buf, DWORD szBuf);
 
 void read(DWORD payload, Header payloadHeader);
-void RX(void** RXPayload, Header* RXHeader);
+DWORD RX(void** RXPayload, Header* RXHeader);
 void TX(void* TXPayload, Header* TXHeader);
-void custMsg();
 int configure(settingsConfigured* sets);
 
 // Sub functions
