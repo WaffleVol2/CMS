@@ -7,36 +7,114 @@
 #include <stdio.h>
 #include <string.h>
 #include "RS232Comm.h"
+#include "Settings.h"
+#include "Header.h"
+#include "Decompression.h"
+#include "Decryption.h"
+#include "sound.h"
 
 #define EX_FATAL 1
 
-void RX(int comRate, int comBits, COMMTIMEOUTS tOut) { //receive
-	const int BUFSIZE = 140;							// Buffer size
+int nComRate = 9600;								// Baud (Bit) rate in bits/second 
+int nComBits = 8;									// Number of bits per frame
+COMMTIMEOUTS timeout;								// A commtimeout struct variable
+wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Rx[] = L"COM3";						// COM port used for Rx (use L"COM6" for transmit program)
+
+Header TXHeader;
+Header RXHeader;
+void* rxPayload = NULL;											// Received payload (buffer) - void so it can be any data type
+
+char msgOut[MSGSIZE] = "Hi there person";
+
+void read(DWORD payload, Header* payloadHeader) {
+	switch ((*payloadHeader).compression) {
+	case 0:
+		printf("Compression: NONE\n");
+		break;
+	case 1:
+		printf("Compression: RLE\n");
+		RLEDecompression(payload);
+		break;
+	case 2:
+		printf("Compression: HUFFMAN\n");
+		huffmanDecompression(payload);
+		break;
+	case 3:
+		printf("Compression: RLE AND HUFFMAN\n");
+		RLEDecompression(payload);
+		huffmanDecompression(payload);
+		break;
+	}
+	switch ((*payloadHeader).encryption) {
+	case 0:
+		printf("Encryption: NONE\n");
+		break;
+	case 1:
+		printf("Encryption: XOR\n");
+		XORDecryption(payload);
+		break;
+	case 2:
+		printf("Encryption: VIRGENERE\n");
+		VirgenereDecryption(payload);
+		break;
+	case 3:
+		printf("Encryption: XOR AND VIRGENERE\n");
+		XORDecryption(payload);
+		VirgenereDecryption(payload);
+		break;
+	}
+	switch ((*payloadHeader).payLoadType) {
+	case 0:
+		printf("Payload: TEXT\n");
+		printf("\nMessage recieved: %s\n", (char*)payload);
+		break;
+	case 1:
+		printf("Payload: AUDIO\n");
+		RecordBuffer((short*)payload, (*payloadHeader).samples);
+		CloseRecording();
+		playback();
+		break;
+	case 2:
+		printf("Payload: SOMETHING ELSE\n");
+		break;
+	}
+}
+
+int configure(settingsConfigured* sets) {
+	nComRate = (*sets).comrate;					// Baud (Bit) rate in bits/second 
+	nComBits = (*sets).combits;					// Number of bits per frame
+	return(1);
+}
+
+void custMsg() {
+	printf("Enter message: ");
+	scanf_s("%[^\n]s", msgOut, (unsigned int)sizeof(msgOut));
+	while (getchar() != '\n') {}
+}
+
+void RX(void** RXPayload, Header* RXHeader) { //receive
 	HANDLE hComRx;										// Pointer to the selected COM port (Receiver)
-	wchar_t COMPORT_Rx[] = L"COM3";						// COM port used for Rx (use L"COM6" for transmit program)
-
-	initPort(&hComRx, COMPORT_Rx, comRate, comBits, tOut);	// Initialize the Rx port
-	Sleep(500);
-
-	char msgIn[BUFSIZE];
 	DWORD bytesRead;
-	bytesRead = inputFromPort(&hComRx, msgIn, BUFSIZE);			// Receive string from port
-	//printf("Length of received msg = %d", bytesRead);
-	msgIn[bytesRead] = '\0';
-	printf("\nMessage Received: %s\n\n", msgIn);				// Display message from port
+
+	initPort(&hComRx, COMPORT_Rx, nComRate, nComBits, timeout);	// Initialize the Rx port
+
+	*RXPayload = (void*)malloc((*RXHeader).payloadSize);				// Allocate buffer memory to receive payload. 
+	bytesRead = inputFromPort(&hComRx, *RXPayload, (*RXHeader).payloadSize);			// Receive data from port
+	//printf("Length of received msg = %d", bytesRead);;
 
 	purgePort(&hComRx);											// Purge the Rx port
 	CloseHandle(hComRx);										// Close the handle to Rx port 
+
+	read(bytesRead, *RXPayload);
 }
 
-void TX(int comRate, int comBits, COMMTIMEOUTS tOut, char msgOut[MSGSIZE]) { //transmit
+void TX(void* TXPayload, Header* TXHeader) { //transmit
 	HANDLE hComTx;										// Pointer to the selected COM port (Transmitter)
-	wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
 
-	initPort(&hComTx, COMPORT_Tx, comRate, comBits, tOut);	// Initialize the Tx port
-	Sleep(500);
+	initPort(&hComTx, COMPORT_Tx, nComRate, nComBits, timeout);	// Initialize the Tx port
 
-	outputToPort(&hComTx, msgOut, strlen(msgOut) + 1);			// Send string to port - include space for '\0' termination
+	outputToPort(&hComTx,TXPayload, sizeof(Header));			// Send string to port - include space for '\0' termination
 	Sleep(500);													// Allow time for signal propagation on cable 
 
 	purgePort(&hComTx);											// Purge the Tx port

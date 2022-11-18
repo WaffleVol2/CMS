@@ -17,12 +17,16 @@
 
 // FUNCTION PROTOTYPES
 /* ************************ */
+
 // Playback
+void playback();
+void filePlayback();
 int InitializePlayback(void);
 int PlayBuffer(short *piBuf, long lSamples);
 void ClosePlayback(void);
 
 // Recording
+void recording();
 int InitializeRecording(void);
 int	RecordBuffer(short *piBuf, long lBufSize);
 void CloseRecording(void);
