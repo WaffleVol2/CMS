@@ -3,6 +3,9 @@
  *
  */
 #pragma once
+#include "Settings.h"
+#include "Header.h"
+#define MSGSIZE 140
 
 // Prototype the functions to be used
 void initPort(HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout);
@@ -10,8 +13,10 @@ void purgePort(HANDLE* hCom);
 void outputToPort(HANDLE* hCom, LPCVOID buf, DWORD szBuf);
 DWORD inputFromPort(HANDLE* hCom, LPVOID buf, DWORD szBuf);
 
-void RX(int comRate, int comBits, COMMTIMEOUTS tOut);
-void TX(int comRate, int comBits, COMMTIMEOUTS tOut, char msgOut[]);
+void read(DWORD payload, Header payloadHeader);
+DWORD RX(void** RXPayload, Header* RXHeader);
+void TX(void* TXPayload, Header* TXHeader);
+int configure(settingsConfigured* sets);
 
 // Sub functions
 void createPortFile(HANDLE* hCom, wchar_t* COMPORT);

@@ -19,11 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Decompression.cpp" />
+    <ClCompile Include="Decryption.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Queues.cpp" />
     <ClCompile Include="RS232Comm.cpp" />
+    <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="sound.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Decompression.h" />
+    <ClInclude Include="Decryption.h" />
+    <ClInclude Include="Header.h" />
+    <ClInclude Include="Queues.h" />
     <ClInclude Include="RS232Comm.h" />
+    <ClInclude Include="Settings.h" />
+    <ClInclude Include="sound.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
