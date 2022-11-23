@@ -1,5 +1,5 @@
 /* RS232Comm.cpp - Implementation for the RS232 communications module
- * By: Michael A. Galle
+ * By: Michael A. Galle || Modified By Brendan B
  *
  */
 #include <Windows.h>    // Includes the functions for serial communication via RS232
@@ -18,8 +18,10 @@
 int nComRate = 9600;								// Baud (Bit) rate in bits/second 
 int nComBits = 8;									// Number of bits per frame
 COMMTIMEOUTS timeout;								// A commtimeout struct variable
-wchar_t COMPORT_Tx[] = L"COM6";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
 wchar_t COMPORT_Rx[] = L"COM7";						// COM port used for Rx (use L"COM6" for transmit program)
+
+char msgOut[MSGSIZE];								// User Message
 
 Header TXHeader;
 Header RXHeader;
@@ -81,7 +83,6 @@ void read(DWORD payload, Header* payloadHeader) {
 
 int configure(settingsConfigured* sets) {
 	nComRate = (*sets).comrate;					// Baud (Bit) rate in bits/second 
-	nComBits = (*sets).combits;					// Number of bits per frame
 	return(1);
 }
 
@@ -91,6 +92,7 @@ DWORD RX(void** RXPayload, Header* RXHeader) { //receive
 	DWORD bytesRead;
 
 	initPort(&hComRx, COMPORT_Rx, nComRate, nComBits, timeout);	// Initialize the Rx port
+	inputFromPort(&hComRx, RXHeader, sizeof(Header));						// Read in Header first (which is a standard number of bytes) to get size of payload 
 
 	*RXPayload = (void*)malloc((*RXHeader).payloadSize);				// Allocate buffer memory to receive payload. 
 	bytesRead = inputFromPort(&hComRx, *RXPayload, (*RXHeader).payloadSize);			// Receive data from port
@@ -99,8 +101,18 @@ DWORD RX(void** RXPayload, Header* RXHeader) { //receive
 	purgePort(&hComRx);											// Purge the Rx port
 	CloseHandle(hComRx);										// Close the handle to Rx port 
 
-	return (bytesRead);
+	return bytesRead;
 	//read(bytesRead, (*RXPayload));
+}
+
+void custMsg() {
+	system("CLS");
+	while (getchar() != '\n') {}
+	printf("Enter message: ");
+	scanf_s("%[^\n]s", msgOut, (unsigned int)sizeof(msgOut));
+	while (getchar() != '\n') {}
+
+	TX(msgOut, configApply());
 }
 
 void TX(void* TXPayload, Header* TXHeader) { //transmit
@@ -108,11 +120,13 @@ void TX(void* TXPayload, Header* TXHeader) { //transmit
 
 	initPort(&hComTx, COMPORT_Tx, nComRate, nComBits, timeout);	// Initialize the Tx port
 
+	//outputToPort(&hComTx, TXHeader, sizeof(Header));			// Send string to port - include space for '\0' termination
+	//Sleep(500);													// Allow time for signal propagation on cable 
 	outputToPort(&hComTx,TXPayload, sizeof(Header));			// Send string to port - include space for '\0' termination
-	Sleep(500);													// Allow time for signal propagation on cable 
 
 	purgePort(&hComTx);											// Purge the Tx port
 	CloseHandle(hComTx);										// Close the handle to Tx port 
+	Sleep(500);
 }
 
 // Initializes the port and sets the communication parameters

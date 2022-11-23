@@ -1,2 +1,4 @@
 G:\Programing\CMS-BrendanB\CMS-BrendanB\x64\Debug\Week2CMS.exe
 M:\Programing\CMS-BrendanB\CMS-BrendanB\x64\Debug\Week2CMS.exe
+M:\Programing\Week3\x64\Debug\Week2CMS.exe
+G:\Programing\Week3\x64\Debug\Week2CMS.exe
