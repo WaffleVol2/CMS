@@ -24,6 +24,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Queues.cpp" />
+    <ClCompile Include="RLE.cpp" />
     <ClCompile Include="RS232Comm.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="sound.cpp" />
@@ -33,7 +34,9 @@
     <ClInclude Include="Decryption.h" />
     <ClInclude Include="Header.h" />
     <ClInclude Include="Menu.h" />
+    <ClInclude Include="Payload.h" />
     <ClInclude Include="Queues.h" />
+    <ClInclude Include="RLE.h" />
     <ClInclude Include="RS232Comm.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="sound.h" />

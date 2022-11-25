@@ -20,7 +20,7 @@
 int nComRate = 9600;								// Baud (Bit) rate in bits/second 
 int nComBits = 8;									// Number of bits per frame
 COMMTIMEOUTS timeout;								// A commtimeout struct variable
-wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Tx[] = L"COM3";						// COM port used for Rx (use L"COM6" for transmit program)
 wchar_t COMPORT_Rx[] = L"COM7";						// COM port used for Rx (use L"COM6" for transmit program)
 
 char msgOut[MSGSIZE];								// User Message

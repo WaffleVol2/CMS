@@ -179,7 +179,7 @@ int audio() {
 
 //TEXT
 int customMessage() {
-	custMsg(configApply());
+	custMsg();
 	return(0);
 }
 
