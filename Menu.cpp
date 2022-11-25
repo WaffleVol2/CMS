@@ -32,9 +32,19 @@ Header txHeader;													// Header transmitted
 Header rxHeader;													// Header received
 void* rxPayload = NULL;												// Received payload (buffer) - void so it can be any data type
 DWORD bytesRead;													// Number of bytes received
-unsigned char msgOut[] = "\nHi there this is a great message for you\n"; 	// Payload is a text message in this example but could be any data	
+
+char msgOut[] = "\nHi there this is a great message for you\n"; 	// Payload is a text message in this example but could be any data	
 
 int mainMenu() {
+
+	// Header (sample data type is text but this should work with audio and images as well)
+	txHeader.sid = 1;
+	txHeader.rid = 2;
+	txHeader.payloadSize = strlen(msgOut) + 1;				// Flexible payload size - Send size of payload inside header (payload can be anything) and enough memory will be malloc'd in the receive function
+	txHeader.compression = '0';									// None
+	txHeader.encryption = '0';									// None
+	txHeader.payLoadType = '0';									// Text
+	
 	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
@@ -376,9 +386,9 @@ int audioSend() {
 //RECEIVE
 int receiverStation() {
 	bytesRead = RX(&rxHeader, &rxPayload, &hComRx, COMPORT_Rx, nComRate, nComBits, timeout);		// Pass pointer to rxPayload so can access malloc'd memory inside the receive function from main()
-	if (rxHeader.compression = '1') {
-		compressed->Data.size = RLEncode((unsigned char*)rxPayload, in->Data.size, compressed->Data.message, in->Data.size, '@'); //compresses the message with RLE
-		printf("\nThe message received is %s", compressed->Data.message);
+	if (rxHeader.compression == '1') {
+		compressed->Data.size = RLDecode((unsigned char*)rxPayload, in->Data.size, decompress->Data.message, in->Data.size, '@'); //compresses the message with RLE
+		printf("\nThe message received is %s", (char*)(compressed->Data.message));
 	}
 	else {
 		printf("\nThe message received is %s", (char*)rxPayload);
@@ -440,12 +450,13 @@ void custMsg() {
 	printf("Enter message: ");
 	scanf_s("%[^\n]s", msgOut, (unsigned int)sizeof(msgOut));
 	while (getchar() != '\n') {}
-	if (txHeader.compression = '1') {
-		compressed->Data.size = RLEncode(msgOut, in->Data.size, compressed->Data.message, in->Data.size, '@'); //compresses the message with RLE
-		TX(&txHeader, compressed->Data.message, &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
+
+	if (txHeader.compression == '1') {
+		compressed->Data.size = RLEncode((unsigned char*)msgOut, in->Data.size, compressed->Data.message, in->Data.size, '@'); //compresses the message with RLE
+		TX(&txHeader, (char*)(compressed->Data.message), &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
 	}
 	else {
 		TX(&txHeader, msgOut, &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
 	}
-
+	return;
 }

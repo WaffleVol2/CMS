@@ -1,2 +1,3 @@
 ﻿  Menu.cpp
+C:\Users\bburd\Desktop\CMS-master\CMS-master\Menu.cpp(43,43): warning C4267: '=': conversion from 'size_t' to 'long', possible loss of data
   Week2CMS.vcxproj -> C:\Users\bburd\Desktop\CMS-master\CMS-master\x64\Debug\Week2CMS.exe
