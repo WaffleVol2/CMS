@@ -12,13 +12,13 @@ struct settings {
 	int comrate = 9600;
 };
 
-void compressionConfig();
-void encryptionConfig();
+void compressionConfig(Header* txHeader);
+void encryptionConfig(Header* txHeader);
 void comrateConfig();
 void portRXConfig();
 void portTXConfig();
-void view();
+void view(Header* txHeader);
 void savePreset();
-void headerToggle();
+void headerToggle(Header* txHeader);
 
 header* configApply();

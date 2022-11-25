@@ -14,9 +14,9 @@ void outputToPort(HANDLE* hCom, LPCVOID buf, DWORD szBuf);
 DWORD inputFromPort(HANDLE* hCom, LPVOID buf, DWORD szBuf);
 
 void read(DWORD payload, Header payloadHeader);
-DWORD RX(void** RXPayload, Header* RXHeader);
+DWORD RX(Header* rxHeader, void** rxPayload, HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout);
 void custMsg();
-void TX(void* TXPayload, Header* TXHeader);
+void TX(Header* txHeader, void* txPayload, HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout);
 int configure(settingsConfigured* sets);
 
 // Sub functions

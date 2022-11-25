@@ -5,11 +5,11 @@
 typedef struct header Header;
 
 struct header {
-	short int sid;
-	short int rid;
-	char priority;
+	short int sid = 1;
+	short int rid = 2;
+	char priority = 1;
 	short int seqNum;
-	short int headerToggle;
+	short int headerToggle = 1;
 	long int payloadSize;		// Number of bytes in payload after this header
 	char payLoadType = '0';			// 0: Text, 1: Audio, 2: Image etc.
 	char encryption = '0';			// 0: None, 1: XOR,	  2: Vigenere	3: Both

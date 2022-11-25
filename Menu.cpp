@@ -9,8 +9,23 @@
 #include "Settings.h"
 
 int CMDMENU;				//User Command
-Header RXHeader;
-void* rxPayload = NULL;		// Received payload (buffer) - void so it can be any data type
+
+// Declare constants, variables and communication parameters
+const int BUFSIZE = 140;							// Buffer size
+wchar_t COMPORT_Rx[] = L"COM8";						// COM port used for Rx 
+wchar_t COMPORT_Tx[] = L"COM6";						// COM port used for Tx 
+HANDLE hComRx;										// Pointer to the selected COM port (Receiver)
+HANDLE hComTx;										// Pointer to the selected COM port (Transmitter)
+int nComRate = 9600;								// Baud (Bit) rate in bits/second 
+int nComBits = 8;									// Number of bits per frame
+COMMTIMEOUTS timeout;								// A commtimeout struct variable
+
+char selection;														// Tx or Rx (can run two instances of this program - double click the exe file)
+Header txHeader;													// Header transmitted 
+Header rxHeader;													// Header received
+void* rxPayload = NULL;												// Received payload (buffer) - void so it can be any data type
+DWORD bytesRead;													// Number of bytes received
+char msgOut[] = "\nHi there this is a great message for you\n"; 	// Payload is a text message in this example but could be any data	
 
 int mainMenu() {
 	while (getchar() != '\n') {}
@@ -93,10 +108,10 @@ int settings() {
 		CMDMENU = getchar();
 		switch (CMDMENU) {
 		case '1':
-			compressionConfig();
+			compressionConfig(&txHeader);
 			break;
 		case '2':
-			encryptionConfig();
+			encryptionConfig(&txHeader);
 			break;
 		case '3':
 			comrateConfig();
@@ -108,7 +123,7 @@ int settings() {
 			portTXConfig();
 			break;
 		case '6':
-			view();
+			view(&txHeader);
 			break;
 		case '7':
 			savePreset();
@@ -351,7 +366,7 @@ int audioSend() {
 
 //RECEIVE
 int receiverStation() {
-	RX(&rxPayload, &RXHeader);
+	bytesRead = RX(&rxHeader, &rxPayload, &hComRx, COMPORT_Rx, nComRate, nComBits, timeout);		// Pass pointer to rxPayload so can access malloc'd memory inside the receive function from main()
 	return(0);
 }
 
@@ -363,7 +378,7 @@ int debug() {
 		CMDMENU = getchar();
 		switch (CMDMENU) {
 		case '1':
-			headerToggle();
+			headerToggle(&txHeader);
 			break;
 		case '2':
 
@@ -399,4 +414,14 @@ int debug() {
 
 int viewStored() {
 	return(0);
+}
+
+void custMsg() {
+	system("CLS");
+	while (getchar() != '\n') {}
+	printf("Enter message: ");
+	scanf_s("%[^\n]s", msgOut, (unsigned int)sizeof(msgOut));
+	while (getchar() != '\n') {}
+
+	TX(&txHeader, msgOut, &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
 }

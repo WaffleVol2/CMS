@@ -9,18 +9,18 @@
 #include "Header.h"
 #include "settings.h"
 
-Header txHeader;				// Header transmitted
 settingsConfigured settings;
 int CMD;			        	//User Command
 
-void compressionConfig() {	
+void compressionConfig(Header* txHeader) {
 	while (getchar() != '\n') {}
 	while(1) {
 		system("CLS");
 		printf("What type of compression would you like? \n[0] None | [1] RLE | [2] Huffman | [3] Both \n");
 		CMD = getchar();
 		if (CMD == '0' || CMD == '1' || CMD == '2' || CMD == '3') {
-			txHeader.compression = CMD;
+			
+			txHeader->compression = CMD;
 			return;
 		}
 		else {
@@ -30,14 +30,14 @@ void compressionConfig() {
 	}															
 }
 
-void encryptionConfig() {
+void encryptionConfig(Header* txHeader) {
 	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
 		printf("What type of encryption would you like? \n[0] None | [1] XOR | [2] Vigenere | [3] Both \n");
 		CMD = getchar();
 		if (CMD == '0' || CMD == '1' || CMD == '2' || CMD == '3') {
-			txHeader.encryption = CMD;
+			txHeader->encryption = CMD;
 			return;
 		}
 		else {
@@ -175,8 +175,8 @@ void portTXConfig() { //Unsure how to overcome issue with wchar_t being a const
 		//Pass wchar_t to main to then pass to Transmit when called...
 }
 
-void view() {
-	switch (txHeader.compression) {
+void view(Header* txHeader) {
+	switch (txHeader->compression) {
 	case '0':
 		printf("Compression: NONE\n");
 		break;
@@ -190,7 +190,7 @@ void view() {
 		printf("Compression: RLE AND HUFFMAN\n");
 		break;
 	}
-	switch (txHeader.encryption) {
+	switch (txHeader->encryption) {
 	case '0':
 		printf("Encryption: NONE\n");
 		break;
@@ -211,20 +211,20 @@ void savePreset() {
 
 }
 
-void headerToggle() {
+void headerToggle(Header* txHeader) {
 	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
 		printf("Would you like the header turned on or off? \n[0] OFF | [1] ON\n");
 		CMD = getchar();
 		if (CMD == '1') {
-			txHeader.headerToggle = 1;
+			txHeader->headerToggle = 1;
 			printf("The header is on");
 			Sleep(1000);
 			return;
 		}
 		else if (CMD == '0') {
-			txHeader.headerToggle = 0;
+			txHeader->headerToggle = 0;
 			printf("The header is off");
 			Sleep(1000);
 			return;
@@ -236,6 +236,6 @@ void headerToggle() {
 	}
 }
 
-Header* configApply() {
-	return (&txHeader);
+Header* configApply(Header* txHeader) {
+	return (txHeader);
 }
