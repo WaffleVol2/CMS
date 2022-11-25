@@ -16,6 +16,7 @@ int audio();
 
 //TEXT
 int customMessage();
+void custMsg();
 int generatFromFile();
 
 //AUDIO

@@ -10,6 +10,7 @@ typedef struct settings settingsConfigured;
 
 struct settings {
 	int comrate = 9600;
+	short int headerToggle = 1;
 };
 
 void compressionConfig(Header* txHeader);
@@ -20,5 +21,3 @@ void portTXConfig();
 void view(Header* txHeader);
 void savePreset();
 void headerToggle(Header* txHeader);
-
-header* configApply();

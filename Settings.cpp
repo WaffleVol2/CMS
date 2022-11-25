@@ -218,13 +218,13 @@ void headerToggle(Header* txHeader) {
 		printf("Would you like the header turned on or off? \n[0] OFF | [1] ON\n");
 		CMD = getchar();
 		if (CMD == '1') {
-			txHeader->headerToggle = 1;
+			settings.headerToggle = 1;
 			printf("The header is on");
 			Sleep(1000);
 			return;
 		}
 		else if (CMD == '0') {
-			txHeader->headerToggle = 0;
+			settings.headerToggle = 0;
 			printf("The header is off");
 			Sleep(1000);
 			return;

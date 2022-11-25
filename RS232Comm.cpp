@@ -1,5 +1,5 @@
 /* RS232Comm.cpp - Implementation for the RS232 communications module
- * By: Michael A. Galle || Modified By Brendan B
+ * By: Michael A. Galle
  *
  */
 #include <Windows.h>    // Includes the functions for serial communication via RS232
@@ -7,84 +7,34 @@
 #include <stdio.h>
 #include <string.h>
 #include "RS232Comm.h"
-#include "Settings.h"
-#include "Header.h"
-#include "Decompression.h"
-#include "Decryption.h"
-#include "sound.h"
-#include "RLE.h"
-#include "Payload.h"
-
+#include "settings.h"
 #define EX_FATAL 1
 
-link compressed = (link)malloc(sizeof(Node));		//Compressed message out
-link decompress = (link)malloc(sizeof(Node));		//Decompressed message
+settingsConfigured settingsConfig;
 
-void read(DWORD payload, Header* payloadHeader) {
-	switch ((*payloadHeader).compression) {
-	case 0:
-		printf("Compression: NONE\n");
-		break;
-	case 1:
-		printf("Compression: RLE\n");
-		RLEDecompression(payload);
-		break;
-	case 2:
-		printf("Compression: HUFFMAN\n");
-		huffmanDecompression(payload);
-		break;
-	case 3:
-		printf("Compression: RLE AND HUFFMAN\n");
-		RLEDecompression(payload);
-		huffmanDecompression(payload);
-		break;
-	}
-	switch ((*payloadHeader).encryption) {
-	case 0:
-		printf("Encryption: NONE\n");
-		break;
-	case 1:
-		printf("Encryption: XOR\n");
-		XORDecryption(payload);
-		break;
-	case 2:
-		printf("Encryption: VIRGENERE\n");
-		VirgenereDecryption(payload);
-		break;
-	case 3:
-		printf("Encryption: XOR AND VIRGENERE\n");
-		XORDecryption(payload);
-		VirgenereDecryption(payload);
-		break;
-	}
-	switch ((*payloadHeader).payLoadType) {
-	case 0:
-		printf("Payload: TEXT\n");
-		printf("\nMessage recieved: %s\n", (char*)payload);
-		break;
-	case 1:
-		printf("Payload: AUDIO\n");
-		RecordBuffer((short*)payload, (*payloadHeader).samples);
-		CloseRecording();
-		playback();
-		break;
-	case 2:
-		printf("Payload: SOMETHING ELSE\n");
-		break;
-	}
+void configApply(settingsConfigured* settings) {
+	settingsConfig = *settings;
 }
 
-int configure(settingsConfigured* sets) {
-	//nComRate = (*sets).comrate;					// Baud (Bit) rate in bits/second 
-	return(0);
+// Main functions
+void TX(Header* txHeader, void* txPayload, HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout) {
+	initPort(hCom, COMPORT, nComRate, nComBits, timeout);				// Initialize the Tx port
+	if (settingsConfig.headerToggle = 1) {
+		outputToPort(hCom, txHeader, sizeof(Header));						// Send Header
+	}
+	outputToPort(hCom, txPayload, (*txHeader).payloadSize);				// Send payload
+	Sleep(500);															// Allow time for signal propagation on cable 
+	purgePort(hCom);													// Purge the Tx port
+	CloseHandle(*hCom);													// Close the handle to Tx port 
 }
-
 
 DWORD RX(Header* rxHeader, void** rxPayload, HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout) {
 	// Note: Pointer to rxPayload buffer (pointer to a pointer) is passed to this function since this function malloc's the amount of memory required - need to free it in main()
-	DWORD bytesRead;
+	DWORD bytesRead;  
 	initPort(hCom, COMPORT, nComRate, nComBits, timeout);				// Initialize the Rx port
-	inputFromPort(hCom, rxHeader, sizeof(Header));						// Read in Header first (which is a standard number of bytes) to get size of payload 
+	if (settingsConfig.headerToggle = 1) {
+		inputFromPort(hCom, rxHeader, sizeof(Header));						// Read in Header first (which is a standard number of bytes) to get size of payload 
+	}
 	*rxPayload = (void*)malloc((*rxHeader).payloadSize);				// Allocate buffer memory to receive payload. Will have to recast these bytess later to a specific data type / struct / etc - rembmer top free it in main()
 	bytesRead = inputFromPort(hCom, *rxPayload, (*rxHeader).payloadSize);// Receive payload 
 	purgePort(hCom);													// Purge the Rx port
@@ -92,15 +42,7 @@ DWORD RX(Header* rxHeader, void** rxPayload, HANDLE* hCom, wchar_t* COMPORT, int
 	return bytesRead;													// Number of bytes read
 }
 
-void TX(Header* txHeader, void* txPayload, HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout) {
-	initPort(hCom, COMPORT, nComRate, nComBits, timeout);				// Initialize the Tx port
-	outputToPort(hCom, txHeader, sizeof(Header));						// Send Header
-	outputToPort(hCom, txPayload, (*txHeader).payloadSize);				// Send payload
-	Sleep(500);															// Allow time for signal propagation on cable 
-	purgePort(hCom);													// Purge the Tx port
-	CloseHandle(*hCom);													// Close the handle to Tx port 
-}
-
+/* *********** Support Functions ******************************************/
 // Initializes the port and sets the communication parameters
 void initPort(HANDLE* hCom, wchar_t* COMPORT, int nComRate, int nComBits, COMMTIMEOUTS timeout) {
 	createPortFile(hCom, COMPORT);						// Initializes hCom to point to PORT#

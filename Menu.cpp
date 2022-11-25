@@ -4,16 +4,23 @@
 #include <string.h>
 #include "Menu.h"
 #include "RS232Comm.h"
-#include "Queues.h"
-#include "sound.h"
+//#include "Queues.h"
+//#include "sound.h"
 #include "Settings.h"
+#include "RLE.h"
+#include "Payload.h"
+
+link in = (link)malloc(sizeof(Node));			//Message in
+link compressed = (link)malloc(sizeof(Node));	//Compressed message out
+link decompress = (link)malloc(sizeof(Node));	//Decompressed message
+
 
 int CMDMENU;				//User Command
 
 // Declare constants, variables and communication parameters
 const int BUFSIZE = 140;							// Buffer size
 wchar_t COMPORT_Rx[] = L"COM8";						// COM port used for Rx 
-wchar_t COMPORT_Tx[] = L"COM6";						// COM port used for Tx 
+wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Tx 
 HANDLE hComRx;										// Pointer to the selected COM port (Receiver)
 HANDLE hComTx;										// Pointer to the selected COM port (Transmitter)
 int nComRate = 9600;								// Baud (Bit) rate in bits/second 
@@ -25,7 +32,7 @@ Header txHeader;													// Header transmitted
 Header rxHeader;													// Header received
 void* rxPayload = NULL;												// Received payload (buffer) - void so it can be any data type
 DWORD bytesRead;													// Number of bytes received
-char msgOut[] = "\nHi there this is a great message for you\n"; 	// Payload is a text message in this example but could be any data	
+unsigned char msgOut[] = "\nHi there this is a great message for you\n"; 	// Payload is a text message in this example but could be any data	
 
 int mainMenu() {
 	while (getchar() != '\n') {}
@@ -51,6 +58,8 @@ int mainMenu() {
 			break;
 		}
 	}
+	free(rxPayload);
+	
 }
 
 //MAIN
@@ -367,6 +376,14 @@ int audioSend() {
 //RECEIVE
 int receiverStation() {
 	bytesRead = RX(&rxHeader, &rxPayload, &hComRx, COMPORT_Rx, nComRate, nComBits, timeout);		// Pass pointer to rxPayload so can access malloc'd memory inside the receive function from main()
+	if (rxHeader.compression = '1') {
+		compressed->Data.size = RLEncode((unsigned char*)rxPayload, in->Data.size, compressed->Data.message, in->Data.size, '@'); //compresses the message with RLE
+		printf("\nThe message received is %s", compressed->Data.message);
+	}
+	else {
+		printf("\nThe message received is %s", (char*)rxPayload);
+	}
+	Sleep(2000);
 	return(0);
 }
 
@@ -374,11 +391,12 @@ int debug() {
 	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
-		printf("What would you like to configure? \n[1] Header ON/OFF | [2] Encryption | [3] Comrate | [4] RX Port | [5] TX Port | [6] Review Configuration | [7] Save Preset | [8] Debug | [0] Exit\n");
+		printf("What would you like to configure? \n[1] Header ON/OFF ||||| [2] Encryption | [3] Comrate | [4] RX Port | [5] TX Port | [6] Review Configuration | [7] Save Preset | [8] Debug | [0] Exit\n");
 		CMDMENU = getchar();
 		switch (CMDMENU) {
 		case '1':
 			headerToggle(&txHeader);
+			rxHeader.payloadSize = sizeof(char[1000]);
 			break;
 		case '2':
 
@@ -422,6 +440,12 @@ void custMsg() {
 	printf("Enter message: ");
 	scanf_s("%[^\n]s", msgOut, (unsigned int)sizeof(msgOut));
 	while (getchar() != '\n') {}
+	if (txHeader.compression = '1') {
+		compressed->Data.size = RLEncode(msgOut, in->Data.size, compressed->Data.message, in->Data.size, '@'); //compresses the message with RLE
+		TX(&txHeader, compressed->Data.message, &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
+	}
+	else {
+		TX(&txHeader, msgOut, &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
+	}
 
-	TX(&txHeader, msgOut, &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
 }
