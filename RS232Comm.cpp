@@ -20,8 +20,8 @@
 int nComRate = 9600;								// Baud (Bit) rate in bits/second 
 int nComBits = 8;									// Number of bits per frame
 COMMTIMEOUTS timeout;								// A commtimeout struct variable
-wchar_t COMPORT_Tx[] = L"COM3";						// COM port used for Rx (use L"COM6" for transmit program)
-wchar_t COMPORT_Rx[] = L"COM7";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Tx[] = L"COM9";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Rx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
 
 char msgOut[MSGSIZE];								// User Message
 link compressed = (link)malloc(sizeof(Node));	//Compressed message out
@@ -105,13 +105,11 @@ DWORD RX(void** RXPayload, Header* RXHeader) { //receive
 
 	*RXPayload = (void*)malloc((*RXHeader).payloadSize);						// Allocate buffer memory to receive payload. 
 	bytesRead = inputFromPort(&hComRx, *RXPayload, (*RXHeader).payloadSize);	// Receive data from port
-	//printf("Length of received msg = %d", bytesRead);;
 
 	purgePort(&hComRx);															// Purge the Rx port
 	CloseHandle(hComRx);														// Close the handle to Rx port 
 
 	return bytesRead;
-	//read(bytesRead, (*RXPayload));
 }
 
 void custMsg() {
@@ -122,7 +120,7 @@ void custMsg() {
 	while (getchar() != '\n') {}
 
 
-	TX(msgOut, configApply());
+	while (1) { TX(msgOut, configApply()); }
 }
 
 void TX(void* TXPayload, Header* TXHeader) { //transmit

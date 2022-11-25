@@ -1,2 +1,4 @@
-﻿  Menu.cpp
-  Week2CMS.vcxproj -> G:\Programing\Week3\x64\Debug\Week2CMS.exe
+﻿  RS232Comm.cpp
+C:\Users\bburd\Desktop\CMS-master\CMS-master\RS232Comm.cpp(70,52): warning C4312: 'type cast': conversion from 'DWORD' to 'char *' of greater size
+C:\Users\bburd\Desktop\CMS-master\CMS-master\RS232Comm.cpp(74,31): warning C4312: 'type cast': conversion from 'DWORD' to 'short *' of greater size
+  Week2CMS.vcxproj -> C:\Users\bburd\Desktop\CMS-master\CMS-master\x64\Debug\Week2CMS.exe
