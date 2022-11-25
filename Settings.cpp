@@ -2,16 +2,16 @@
  * By: Brendan Burdett
  *
  */
-#include <Windows.h>    // Includes the functions for serial communication via RS232
+#include <Windows.h>   
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "Header.h"
 #include "settings.h"
 
-Header txHeader;												// Header transmitted
+Header txHeader;				// Header transmitted
 settingsConfigured settings;
-int CMD;				//User Command
+int CMD;			        	//User Command
 
 void compressionConfig() {	
 	while (getchar() != '\n') {}
@@ -175,38 +175,6 @@ void portTXConfig() { //Unsure how to overcome issue with wchar_t being a const
 		//Pass wchar_t to main to then pass to Transmit when called...
 }
 
-void combitsConfig() { //Need help from michael, com bits can be 2, 4 , 8...?
-	while (getchar() != '\n') {}
-	while (1) {
-		system("CLS");
-		printf("How many bits per frame would you like? \n[0] COM1 | [1] COM2 | [2] COM3 | [3] COM4 | [4] COM5 | [5] COM6 | [6] COM7 | [7] COM8 | [8] COM9\n");
-		CMD = getchar();
-		switch (CMD) {
-		case '0':
-			break;
-		case '1':
-			break;
-		case '2':
-			break;
-		case '3':
-			break;
-		case '4':
-			break;
-		case '5':
-			break;
-		case '6':
-			break;
-		case '7':
-			break;
-		case '8':
-			break;
-		default:
-			Sleep(500);
-			break;
-		}
-	}
-}
-
 void view() {
 	switch (txHeader.compression) {
 	case '0':
@@ -237,11 +205,35 @@ void view() {
 		break;
 	}
 	printf("Comrate: %d\n", settings.comrate);
-	printf("Combits: %d\n", settings.combits);
 }
 
 void savePreset() {
 
+}
+
+void headerToggle() {
+	while (getchar() != '\n') {}
+	while (1) {
+		system("CLS");
+		printf("Would you like the header turned on or off? \n[0] OFF | [1] ON\n");
+		CMD = getchar();
+		if (CMD == '1') {
+			txHeader.headerToggle = 1;
+			printf("The header is on");
+			Sleep(1000);
+			return;
+		}
+		else if (CMD == '0') {
+			txHeader.headerToggle = 0;
+			printf("The header is off");
+			Sleep(1000);
+			return;
+		}
+		else {
+			printf("Error, Please try again.");
+		}
+		Sleep(1000);
+	}
 }
 
 Header* configApply() {

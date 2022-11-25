@@ -22,6 +22,7 @@
     <ClCompile Include="Decompression.cpp" />
     <ClCompile Include="Decryption.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Queues.cpp" />
     <ClCompile Include="RS232Comm.cpp" />
     <ClCompile Include="Settings.cpp" />
@@ -31,6 +32,7 @@
     <ClInclude Include="Decompression.h" />
     <ClInclude Include="Decryption.h" />
     <ClInclude Include="Header.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="Queues.h" />
     <ClInclude Include="RS232Comm.h" />
     <ClInclude Include="Settings.h" />

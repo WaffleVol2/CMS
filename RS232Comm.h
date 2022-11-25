@@ -15,6 +15,7 @@ DWORD inputFromPort(HANDLE* hCom, LPVOID buf, DWORD szBuf);
 
 void read(DWORD payload, Header payloadHeader);
 DWORD RX(void** RXPayload, Header* RXHeader);
+void custMsg(Header* TXHeader);
 void TX(void* TXPayload, Header* TXHeader);
 int configure(settingsConfigured* sets);
 

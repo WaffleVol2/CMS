@@ -1,5 +1,5 @@
 /* RS232Comm.cpp - Implementation for the RS232 communications module
- * By: Michael A. Galle
+ * By: Michael A. Galle || Modified By Brendan B
  *
  */
 #include <Windows.h>    // Includes the functions for serial communication via RS232
@@ -12,18 +12,20 @@
 #include "Decompression.h"
 #include "Decryption.h"
 #include "sound.h"
+#include "RLE.h"
+#include "Payload.h"
 
 #define EX_FATAL 1
 
 int nComRate = 9600;								// Baud (Bit) rate in bits/second 
 int nComBits = 8;									// Number of bits per frame
 COMMTIMEOUTS timeout;								// A commtimeout struct variable
-wchar_t COMPORT_Tx[] = L"COM6";						// COM port used for Rx (use L"COM6" for transmit program)
+wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Rx (use L"COM6" for transmit program)
 wchar_t COMPORT_Rx[] = L"COM7";						// COM port used for Rx (use L"COM6" for transmit program)
 
-Header TXHeader;
-Header RXHeader;
-void* rxPayload = NULL;											// Received payload (buffer) - void so it can be any data type
+char msgOut[MSGSIZE];								// User Message
+link compressed = (link)malloc(sizeof(Node));	//Compressed message out
+link decompress = (link)malloc(sizeof(Node));	//Decompressed message
 
 void read(DWORD payload, Header* payloadHeader) {
 	switch ((*payloadHeader).compression) {
@@ -81,26 +83,46 @@ void read(DWORD payload, Header* payloadHeader) {
 
 int configure(settingsConfigured* sets) {
 	nComRate = (*sets).comrate;					// Baud (Bit) rate in bits/second 
-	nComBits = (*sets).combits;					// Number of bits per frame
-	return(1);
+	return(0);
 }
 
 
 DWORD RX(void** RXPayload, Header* RXHeader) { //receive
-	HANDLE hComRx;										// Pointer to the selected COM port (Receiver)
+	HANDLE hComRx;																// Pointer to the selected COM port (Receiver)
 	DWORD bytesRead;
 
-	initPort(&hComRx, COMPORT_Rx, nComRate, nComBits, timeout);	// Initialize the Rx port
+	if (RXHeader->headerToggle == 1) {
+		initPort(&hComRx, COMPORT_Rx, nComRate, nComBits, timeout);					// Initialize the Rx port
+		inputFromPort(&hComRx, RXHeader, sizeof(Header));							// Read in Header first (which is a standard number of bytes) to get size of payload 
+	}
 
-	*RXPayload = (void*)malloc((*RXHeader).payloadSize);				// Allocate buffer memory to receive payload. 
-	bytesRead = inputFromPort(&hComRx, *RXPayload, (*RXHeader).payloadSize);			// Receive data from port
+	RXHeader->payloadSize = sizeof(RXPayload);
+
+	if (RXHeader->compression == '1') {
+		RXHeader->payloadSize = RLDecode(static_cast<unsigned char*>(*RXPayload), RXHeader->payloadSize, decompress->Data.message, RXHeader->payloadSize, '@'); //Decompresses the message
+		*RXPayload = decompress->Data.message;
+	}
+
+	*RXPayload = (void*)malloc((*RXHeader).payloadSize);						// Allocate buffer memory to receive payload. 
+	bytesRead = inputFromPort(&hComRx, *RXPayload, (*RXHeader).payloadSize);	// Receive data from port
 	//printf("Length of received msg = %d", bytesRead);;
 
-	purgePort(&hComRx);											// Purge the Rx port
-	CloseHandle(hComRx);										// Close the handle to Rx port 
+	purgePort(&hComRx);															// Purge the Rx port
+	CloseHandle(hComRx);														// Close the handle to Rx port 
 
-	return (bytesRead);
+	return bytesRead;
 	//read(bytesRead, (*RXPayload));
+}
+
+void custMsg() {
+	system("CLS");
+	while (getchar() != '\n') {}
+	printf("Enter message: ");
+	scanf_s("%[^\n]s", msgOut, (unsigned int)sizeof(msgOut));
+	while (getchar() != '\n') {}
+
+
+	TX(msgOut, configApply());
 }
 
 void TX(void* TXPayload, Header* TXHeader) { //transmit
@@ -108,11 +130,25 @@ void TX(void* TXPayload, Header* TXHeader) { //transmit
 
 	initPort(&hComTx, COMPORT_Tx, nComRate, nComBits, timeout);	// Initialize the Tx port
 
-	outputToPort(&hComTx,TXPayload, sizeof(Header));			// Send string to port - include space for '\0' termination
-	Sleep(500);													// Allow time for signal propagation on cable 
+	TXHeader->payloadSize = sizeof(TXPayload);
+
+	if (TXHeader->compression == '1') {
+		TXHeader->payloadSize = RLEncode(static_cast<unsigned char*>(TXPayload), TXHeader->payloadSize, compressed->Data.message, TXHeader->payloadSize, '@'); //compresses the message with RLE
+		TXPayload = compressed->Data.message;
+	}
+
+
+	if (TXHeader->headerToggle == 1) {
+		outputToPort(&hComTx, TXHeader, sizeof(Header));			// Send string to port - include space for '\0' termination
+		Sleep(500);													// Allow time for signal propagation on cable 
+	}
+
+
+	outputToPort(&hComTx, TXPayload, TXHeader->payloadSize);			// Send string to port - include space for '\0' termination
 
 	purgePort(&hComTx);											// Purge the Tx port
 	CloseHandle(hComTx);										// Close the handle to Tx port 
+	Sleep(500);
 }
 
 // Initializes the port and sets the communication parameters

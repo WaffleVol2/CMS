@@ -9,6 +9,7 @@ struct header {
 	short int rid;
 	char priority;
 	short int seqNum;
+	short int headerToggle;
 	long int payloadSize;		// Number of bytes in payload after this header
 	char payLoadType = '0';			// 0: Text, 1: Audio, 2: Image etc.
 	char encryption = '0';			// 0: None, 1: XOR,	  2: Vigenere	3: Both
