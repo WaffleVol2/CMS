@@ -34,3 +34,6 @@ void CloseRecording(void);
 // Support functions for Playback functions (updated 2021)
 void SetupFormat(WAVEFORMATEX* wf);			// Used by InitializePlayback()					
 int WaitOnHeader(WAVEHDR* wh, char cDit);	// Used by Playbuffer()
+
+void audioApply(short* buff); //passed the needed buffer for the audio
+void fileSaveAudio();              //saves the audio to the file

@@ -5,10 +5,12 @@
 #include "Menu.h"
 #include "RS232Comm.h"
 //#include "Queues.h"
-//#include "sound.h"
+#include "sound.h"
 #include "Settings.h"
 #include "RLE.h"
-#include "Payload.h"
+#include "FileRead.h"
+
+link fileMsg = (link)malloc(sizeof(Node));
 
 link in = (link)malloc(sizeof(Node));			//Message in
 link compressed = (link)malloc(sizeof(Node));	//Compressed message out
@@ -33,11 +35,12 @@ Header rxHeader;													// Header received
 void* rxPayload = NULL;												// Received payload (buffer) - void so it can be any data type
 DWORD bytesRead;													// Number of bytes received
 
-char msgOut[] = "\nHi there this is a great message for you\n"; 	// Payload is a text message in this example but could be any data	
+char msgOut[] = "\nHi there this is a great message for you\n"; 	// Payload for text
+short audioBuf[SAMPLES_SEC * RECORD_TIME];							// Payload for audio 
 
 int mainMenu() {
 
-	// Header (sample data type is text but this should work with audio and images as well)
+	///////////////////////////////////DEBUG/////////////////////////////////
 	txHeader.sid = 1;
 	txHeader.rid = 2;
 	txHeader.payloadSize = strlen(msgOut) + 1;				// Flexible payload size - Send size of payload inside header (payload can be anything) and enough memory will be malloc'd in the receive function
@@ -45,6 +48,7 @@ int mainMenu() {
 	txHeader.encryption = '0';									// None
 	txHeader.payLoadType = '0';									// Text
 	
+
 	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
@@ -67,9 +71,9 @@ int mainMenu() {
 			Sleep(500);
 			break;
 		}
+		while (getchar() != '\n') {}
 	}
 	free(rxPayload);
-	
 }
 
 //MAIN
@@ -93,6 +97,7 @@ int transmit() {
 			Sleep(500);
 			break;
 		}
+		while (getchar() != '\n') {}
 	}
 }
 
@@ -116,6 +121,7 @@ int receive() {
 			Sleep(500);
 			break;
 		}
+		while (getchar() != '\n') {}
 	}
 }
 
@@ -158,6 +164,7 @@ int settings() {
 			Sleep(500);
 			break;
 		}
+		while (getchar() != '\n') {}
 	}
 }
 
@@ -182,6 +189,7 @@ int text() {
 			Sleep(500);
 			break;
 		}
+		while (getchar() != '\n') {}
 	}
 }
 
@@ -208,6 +216,7 @@ int audio() {
 			Sleep(500);
 			break;
 		}
+		while (getchar() != '\n') {}
 	}
 }
 
@@ -218,190 +227,62 @@ int customMessage() {
 }
 
 int generatFromFile() {
-	while (getchar() != '\n') {}
-	while (1) {
-		system("CLS");
-		printf("\n");
-		CMDMENU = getchar();
-		switch (CMDMENU) {
-		case '0':
-
-			break;
-		case '1':
-
-			break;
-		case '2':
-
-			break;
-		case '3':
-
-			break;
-		case '4':
-
-			break;
-		case '5':
-
-			break;
-		case '6':
-
-			break;
-		case '7':
-
-			break;
-		case '8':
-
-			break;
-		default:
-			Sleep(500);
-			break;
-		}
-	}
+	getMsgFile(&fileMsg);
+	printf("Your message is: %s", fileMsg->Data.message);
+	return(0);
 }
 
 //AUDIO
 int record() {
-	while (getchar() != '\n') {}
-	while (1) {
-		system("CLS");
-		printf("\n");
-		CMDMENU = getchar();
-		switch (CMDMENU) {
-		case '0':
-
-			break;
-		case '1':
-
-			break;
-		case '2':
-
-			break;
-		case '3':
-
-			break;
-		case '4':
-
-			break;
-		case '5':
-
-			break;
-		case '6':
-
-			break;
-		case '7':
-
-			break;
-		case '8':
-
-			break;
-		default:
-			Sleep(500);
-			break;
-		}
-	}
+	recording();
+	audioApply(audioBuf);
+	return(0);
 }
 
 int loadFromFile() {
-	while (getchar() != '\n') {}
-	while (1) {
-		system("CLS");
-		printf("\n");
-		CMDMENU = getchar();
-		switch (CMDMENU) {
-		case '0':
-
-			break;
-		case '1':
-
-			break;
-		case '2':
-
-			break;
-		case '3':
-
-			break;
-		case '4':
-
-			break;
-		case '5':
-
-			break;
-		case '6':
-
-			break;
-		case '7':
-
-			break;
-		case '8':
-
-			break;
-		default:
-			Sleep(500);
-			break;
-		}
-	}
+	filePlayback();
+	audioApply(audioBuf);
+	return(0);
 }
 
 int audioSend() {
-	while (getchar() != '\n') {}
-	while (1) {
-		system("CLS");
-		printf("\n");
-		CMDMENU = getchar();
-		switch (CMDMENU) {
-		case '0':
-
-			break;
-		case '1':
-
-			break;
-		case '2':
-
-			break;
-		case '3':
-
-			break;
-		case '4':
-
-			break;
-		case '5':
-
-			break;
-		case '6':
-
-			break;
-		case '7':
-
-			break;
-		case '8':
-
-			break;
-		default:
-			Sleep(500);
-			break;
-		}
-	}
+	TX(&txHeader, audioBuf, &hComTx, COMPORT_Tx, nComRate, nComBits, timeout);
+	return(0);
 }
 
 
 //RECEIVE
 int receiverStation() {
 	bytesRead = RX(&rxHeader, &rxPayload, &hComRx, COMPORT_Rx, nComRate, nComBits, timeout);		// Pass pointer to rxPayload so can access malloc'd memory inside the receive function from main()
-	if (rxHeader.compression == '1') {
-		compressed->Data.size = RLDecode((unsigned char*)rxPayload, in->Data.size, decompress->Data.message, in->Data.size, '@'); //compresses the message with RLE
-		printf("\nThe message received is %s", (char*)(compressed->Data.message));
+	
+	printf("\nMessage received from %d to %d", rxHeader.rid, rxHeader.sid);
+	
+	switch (rxHeader.payLoadType) {
+	case '0'://TEXT
+		if (rxHeader.compression == '1') {
+			compressed->Data.size = RLDecode((unsigned char*)rxPayload, in->Data.size, decompress->Data.message, in->Data.size, '@'); //compresses the message with RLE
+			printf("\nThe text message received is %s", (char*)(compressed->Data.message));
+		}
+		else {
+			printf("\nThe text message received is %s", (char*)rxPayload);
+		}
+		Sleep(2000);
+		return(0);
+	case '1'://AUDIO
+		audioApply((short *)rxPayload);
+		playback();
+		fileSaveAudio();
+		return(0);
+	case '2'://OTHER
+		return(0);
 	}
-	else {
-		printf("\nThe message received is %s", (char*)rxPayload);
-	}
-	Sleep(2000);
-	return(0);
 }
 
 int debug() {
 	while (getchar() != '\n') {}
 	while (1) {
 		system("CLS");
-		printf("What would you like to configure? \n[1] Header ON/OFF ||||| [2] Encryption | [3] Comrate | [4] RX Port | [5] TX Port | [6] Review Configuration | [7] Save Preset | [8] Debug | [0] Exit\n");
+		printf("What would you like to configure? \n[1] Header ON/OFF | [0] Exit\n");
 		CMDMENU = getchar();
 		switch (CMDMENU) {
 		case '1':

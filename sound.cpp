@@ -37,16 +37,32 @@ FILE* f;
 /* PLAYBACK FUNCTIONS */
 /* ********************************************************************************************* */
 
-void filePlayback() {
-	// replay audio recording from file -- read and store in buffer, then use playback() to play it
-	printf("Would you like to replay the saved audio recording from the file? (y/n): ");
-	scanf_s("%c", &replay, 1);
+void fileSaveAudio() {
+	// save audio recording  
 	while ((c = getchar()) != '\n' && c != EOF) {}								// Flush other input
-	if ((replay == 'y') || (replay == 'Y')) {
-		//Open input file 
-		fopen_s(&f, "G:\Programing\\recording.dat", "rb");
+	printf("Would you like to save your audio recording? (y/n): ");
+	scanf_s("%c", &save, 1);
+	if ((save == 'y') || (save == 'Y')) {
+		// Open input file 
+		fopen_s(&f, "G:\\Programing\\recording.dat", "wb");
 		if (!f) {
-			printf("unable to open %s\n", "M:\\PROG 71985\\Project2\\recording.dat");
+			printf("unable to open %s\n", "G:\\Programing\\recording.dat");
+			return;
+		}
+		printf("Writing to sound file ...\n");
+		fwrite(iBigBuf, sizeof(short), lBigBufSize, f);
+		fclose(f);
+	}
+}
+
+void audioApply(short* buff) {
+	buff = iBigBufNew;
+}
+
+void filePlayback() {
+		fopen_s(&f, "G:\\Programing\\recording.dat", "rb");
+		if (!f) {
+			printf("unable to open %s\n", "G:\\Programing\\recording.dat");
 		}
 		printf("Reading from sound file ...\n");
 		fread(iBigBufNew, sizeof(short), lBigBufSize, f);				// Record to new buffer iBigBufNew
@@ -55,7 +71,6 @@ void filePlayback() {
 		printf("\nPlaying recording from saved file ...\n");
 		PlayBuffer(iBigBufNew, lBigBufSize);
 		ClosePlayback();
-	}
 }
 
 void playback(){
@@ -70,26 +85,9 @@ void recording() {
 	RecordBuffer(iBigBuf, lBigBufSize);
 	CloseRecording();
 
-	// playback recording 
-	printf("\nPlaying recording from buffer\n");
-	PlayBuffer(iBigBuf, lBigBufSize);
-	ClosePlayback();
+	playback();
 
-	// save audio recording  
-	printf("Would you like to save your audio recording? (y/n): ");
-	scanf_s("%c", &save, 1);
-	while ((c = getchar()) != '\n' && c != EOF) {}								// Flush other input
-	if ((save == 'y') || (save == 'Y')) {
-		// Open input file 
-		fopen_s(&f, "G:\Programing\\recording.dat", "wb");
-		if (!f) {
-			printf("unable to open %s\n", "G:\Programing\\recording.dat");
-			return;
-		}
-		printf("Writing to sound file ...\n");
-		fwrite(iBigBuf, sizeof(short), lBigBufSize, f);
-		fclose(f);
-	}
+	fileSaveAudio();
 }
 
 int	InitializePlayback(void)

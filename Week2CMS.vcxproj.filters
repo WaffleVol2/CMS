@@ -42,6 +42,9 @@
     <ClCompile Include="RS232Comm.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MSGget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Queues.h">
@@ -66,9 +69,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RLE.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Payload.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RS232Comm.h">

@@ -13,6 +13,8 @@ struct settings {
 	short int headerToggle = 1;
 };
 
+void receiverID(Header* txHeader);
+void senderID(Header* txHeader);
 void compressionConfig(Header* txHeader);
 void encryptionConfig(Header* txHeader);
 void comrateConfig();

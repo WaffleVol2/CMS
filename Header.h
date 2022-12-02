@@ -7,8 +7,8 @@
 typedef struct header Header;
 
 struct header {
-	short int sid;
-	short int rid;
+	char sid;
+	char rid;
 	char priority;
 	short int seqNum;
 	long int payloadSize;		// Number of bytes in payload after this header

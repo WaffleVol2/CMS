@@ -11,6 +11,21 @@
 
 settingsConfigured settings;
 int CMD;			        	//User Command
+char IDTemp[] = "HahFunnyName"; 	// Payload for text
+
+void receiverID(Header* txHeader) {
+	printf("Enter desired receiver ID: ");
+	scanf_s("%[^\n]s", IDTemp, (unsigned int)sizeof(IDTemp));
+
+	txHeader->rid = (short int)IDTemp;
+}
+
+void senderID(Header* txHeader) {
+	printf("Enter desired sender ID: ");
+	scanf_s("%[^\n]s", IDTemp, (unsigned int)sizeof(IDTemp));
+	
+	txHeader->sid = (short int)IDTemp;
+}
 
 void compressionConfig(Header* txHeader) {
 	while (getchar() != '\n') {}
