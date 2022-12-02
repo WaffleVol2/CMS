@@ -1,13 +1,2 @@
-﻿  Menu.cpp
-G:\Programing\Week5\Menu.cpp(46,43): warning C4267: '=': conversion from 'size_t' to 'long', possible loss of data
-  RS232Comm.cpp
-  Settings.cpp
-G:\Programing\Week5\Settings.cpp(20,35): warning C4302: 'type cast': truncation from 'char *' to 'short'
-G:\Programing\Week5\Settings.cpp(20,29): warning C4244: '=': conversion from 'short' to 'char', possible loss of data
-G:\Programing\Week5\Settings.cpp(27,35): warning C4302: 'type cast': truncation from 'char *' to 'short'
-G:\Programing\Week5\Settings.cpp(27,29): warning C4244: '=': conversion from 'short' to 'char', possible loss of data
-  main.cpp
-  sound.cpp
-  Generating Code...
-G:\Programing\Week5\Menu.cpp(279): warning C4715: 'receiverStation': not all control paths return a value
+﻿  sound.cpp
   Week2CMS.vcxproj -> G:\Programing\Week5\x64\Debug\Week2CMS.exe

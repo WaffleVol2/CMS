@@ -35,5 +35,6 @@ void CloseRecording(void);
 void SetupFormat(WAVEFORMATEX* wf);			// Used by InitializePlayback()					
 int WaitOnHeader(WAVEHDR* wh, char cDit);	// Used by Playbuffer()
 
-void audioApply(short* buff); //passed the needed buffer for the audio
-void fileSaveAudio();              //saves the audio to the file
+void audioApplyTX(short* buff); //passed the needed buffer for the TX audio
+void audioApplyRX(short* buff); //passed the needed buffer for the RX audio
+void fileSaveAudio();             //saves the audio to the file

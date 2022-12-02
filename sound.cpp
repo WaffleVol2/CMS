@@ -55,8 +55,12 @@ void fileSaveAudio() {
 	}
 }
 
-void audioApply(short* buff) {
+void audioApplyTX(short* buff) {
 	buff = iBigBufNew;
+}
+
+void audioApplyRX(short* buff) {
+	iBigBufNew = buff;
 }
 
 void filePlayback() {

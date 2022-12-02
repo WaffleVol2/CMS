@@ -21,8 +21,8 @@ int CMDMENU;				//User Command
 
 // Declare constants, variables and communication parameters
 const int BUFSIZE = 140;							// Buffer size
-wchar_t COMPORT_Rx[] = L"COM8";						// COM port used for Rx 
-wchar_t COMPORT_Tx[] = L"COM8";						// COM port used for Tx 
+wchar_t COMPORT_Rx[] = L"COM4";						// COM port used for Rx 
+wchar_t COMPORT_Tx[] = L"COM4";						// COM port used for Tx 
 HANDLE hComRx;										// Pointer to the selected COM port (Receiver)
 HANDLE hComTx;										// Pointer to the selected COM port (Transmitter)
 int nComRate = 9600;								// Baud (Bit) rate in bits/second 
@@ -46,7 +46,7 @@ int mainMenu() {
 	txHeader.payloadSize = strlen(msgOut) + 1;				// Flexible payload size - Send size of payload inside header (payload can be anything) and enough memory will be malloc'd in the receive function
 	txHeader.compression = '0';									// None
 	txHeader.encryption = '0';									// None
-	txHeader.payLoadType = '0';									// Text
+	txHeader.payLoadType = '1';									// Text
 	
 
 	while (getchar() != '\n') {}
